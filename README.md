@@ -22,6 +22,8 @@ A [KeePass 2.x](https://keepass.info/) plugin that performs real-time network di
 ## Screenshots
 
 ### Network Checker popup
+![Network Checker popup](https://raw.githubusercontent.com/karanikn/KeePassNetworkChecker/main/Screenshots/network_checker1.png)
+
 The popup shows detailed results per entry with color-coded status indicators.
 
 | Column | Description |
@@ -32,6 +34,17 @@ The popup shows detailed results per entry with color-coded status indicators.
 | Port   | TCP port connect result and latency |
 | HTTP   | HTTP response code (200, 403, etc.) or ERR |
 | Status | UP / DOWN composite result |
+
+### Results with UP/DOWN status
+![Network Checker results](https://raw.githubusercontent.com/karanikn/KeePassNetworkChecker/main/Screenshots/network_checker2.png)
+
+### Group context menu
+![Group context menu](https://raw.githubusercontent.com/karanikn/KeePassNetworkChecker/main/Screenshots/network_checker_group-menu.png)
+
+Right-click any group → **Network Check All Group Entries** to check all entries in that group at once.
+
+### Options dialog
+![Options dialog](https://raw.githubusercontent.com/karanikn/KeePassNetworkChecker/main/Screenshots/network_options.png)
 
 ### Net Status column
 After running a check, the `Net Status` column in the KeePass entry list is updated with UP or DOWN for each checked entry. To enable it: **View → Configure Columns → enable "Net Status"**.
