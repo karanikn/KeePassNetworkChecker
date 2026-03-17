@@ -11,12 +11,50 @@ namespace KeePassNetworkChecker
         private IPluginHost m_host = null;
         internal NetworkStatusColumnProvider ColProvider = null;
 
-        internal const string CfgShowWindow = "KeePassNetworkChecker.ShowWindow";
+        internal const string CfgShowWindow    = "KeePassNetworkChecker.ShowWindow";
+        internal const string CfgResolve       = "KeePassNetworkChecker.Resolve";
+        internal const string CfgTimeout       = "KeePassNetworkChecker.Timeout";
+        internal const string CfgEnabledPorts  = "KeePassNetworkChecker.EnabledPorts";
+        internal const string CfgExtraPorts    = "KeePassNetworkChecker.ExtraPorts";
+
+        internal int GetTimeout()
+        {
+            return (int)m_host.CustomConfig.GetULong(CfgTimeout, 500);
+        }
+
+        internal bool GetResolve()
+        {
+            return m_host.CustomConfig.GetBool(CfgResolve, false);
+        }
+
+        internal int[] GetPorts()
+        {
+            // Common ports that are checked
+            string enabledRaw = m_host.CustomConfig.GetString(
+                CfgEnabledPorts, "21,22,23,25,80,443,554,3389");
+
+            // Extra custom ports
+            string extraRaw = m_host.CustomConfig.GetString(CfgExtraPorts, "");
+
+            string combined = string.IsNullOrEmpty(extraRaw)
+                ? enabledRaw
+                : enabledRaw + "," + extraRaw;
+
+            HashSet<int> seen   = new HashSet<int>();
+            List<int>    unique = new List<int>();
+            foreach (string s in combined.Split(','))
+            {
+                int p;
+                if (int.TryParse(s.Trim(), out p) && p > 0 && p <= 65535 && seen.Add(p))
+                    unique.Add(p);
+            }
+            return unique.ToArray();
+        }
 
         public override bool Initialize(IPluginHost host)
         {
             if (host == null) return false;
-            m_host = host;
+            m_host      = host;
             ColProvider = new NetworkStatusColumnProvider(m_host);
             m_host.ColumnProviderPool.Add(ColProvider);
             return true;
@@ -60,10 +98,8 @@ namespace KeePassNetworkChecker
                     if (grp == null) return;
                     List<PwEntry> list = new List<PwEntry>();
                     foreach (PwEntry pe in grp.Entries)
-                    {
                         if (!string.IsNullOrEmpty(pe.Strings.ReadSafe("URL").Trim()))
                             list.Add(pe);
-                    }
                     if (list.Count == 0)
                     {
                         MessageBox.Show("No entries with URLs found in this group.",
